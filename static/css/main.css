@@ -1,0 +1,65 @@
+body{
+	background-color: #FFF;
+}
+.main{
+	color: red;
+	width: 600px;
+	font-weight: bold;
+	margin: 0 auto 0 auto;
+}
+.logo{
+	width: 486px;
+	height: 184px;
+	margin: 0 auto 0 auto;
+}
+.search{
+	position: relative;
+	height: 50px;
+}
+.search:after{
+	display: block;
+	width: 0px;
+	height: 0px;
+	overflow: hidden;
+	clear: both;
+	content: ' ';
+}
+.search input{
+	display: block;
+	float: left;
+	width: 508px;
+	height: 40px;
+	padding: 5px;
+	margin: 0;
+	font-size: 24px;
+	border: 1px solid #aaa;
+	border-right: none;
+	outline: none;
+}
+.search button{
+	display: block;
+	float: left;
+	width: 80px;
+	height: 52px;
+}
+.suggest{
+	position: absolute;
+	width: 518px;
+	border: 1px solid #ccc;
+	top: 52px;
+	left: 0px;
+}
+.suggest ul{
+	margin: 0px;
+	padding: 0px;
+}
+.suggest li{
+	line-height: 24px;
+	padding: 0 5px;
+	color: #000;
+	cursor: default;
+	list-style: none;
+}
+.suggest li:hover{
+	background-color: #EEE;
+}

@@ -1,0 +1,21 @@
+[Version]
+Signature="$CHICAGO$"
+Provider=lifesinger@gmail.com, 2009
+
+[DefaultInstall]
+AddReg=Install_AddReg
+
+[DefaultUnInstall]
+DelReg=Uninstall_DelReg
+
+[Uninstall_DelReg]
+hkcr,"Directory\Shell\HttpServer"
+hkcr,"Directory\Background\Shell\HttpServer"
+
+[Install_AddReg]
+hkcr,"Directory\Shell\HttpServer",,,"Start With HttpServer"
+hkcr,"Directory\Shell\HttpServer\command",,,"""%01%\httpServer.cmd"" ""%%1"""
+
+hkcr,"Directory\Background\Shell\HttpServer",,,"Start With HttpServer"
+hkcr,"Directory\Background\Shell\HttpServer\command",,,"%01%\httpServer.cmd ""%V"""
+

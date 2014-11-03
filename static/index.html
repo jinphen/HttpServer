@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>HttpServer Test</title>
+	<link rel="icon" type="image/x-icon" href="favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<script type="text/javascript" src="js/jquery-1.11.1.js"></script>
+	<script type="text/javascript" src="js/sea.js"></script>
+</head>
+<body>
+	<div class="main">
+		<div class="logo">
+			<a href="#"><img src="images/logo.jpg"/></a>
+		</div>
+		<div class="search">
+			<input type="text" id="keyword" autocomplete="off" />
+			<button id="search">Search</button>
+			<div class="suggest" style="display:none;">
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		$('#keyword').on('keyup focus', function(){
+            getSuggest(this.value).done(renderSuggest);
+        });
+           
+		$('#search').click(function(){
+			var keyword = $('#keyword').val();
+			$.get('/search?keyword=' + keyword, function(data){
+				
+			});
+		});
+        function getSuggest(keyword){
+            return $.getJSON('/search?keyword=' + keyword);
+        }
+        function renderSuggest(suggest) {
+            var list = suggest.s;
+            if ($.isArray(list) && list.length === 0){
+                $('.suggest').hide();
+            } else {
+                var sug = ['<ul>'];
+                $.each(list, function(i, item) {
+                    sug.push('<li>'+item+'</li>');
+                });
+                sug.push('</ul>');
+                $('.suggest').html(sug.join('')).show();
+            }
+        }
+        $(document).on('click', function(event) {
+            var $target = $(event.target);
+            if ($target.closest('.suggest').length === 0) {
+                $('.suggest').hide();
+            }
+        }) 
+
+
+		// seajs.use('router', function(router) {
+		// 	router.add('/', function(path){
+		// 		console.log('path: %s, => root handle', path);
+		// 	});
+		// 	router.add('/hello', function(path){
+		// 		console.log('path: %s, => hello handle', path);
+		// 	});
+		// 	router.add('/hello/world', function(path){
+		// 		console.log('path: %s, => world handle', path);
+		// 	});
+		// 	router.add('/good', function(path){
+		// 		console.log('path: %s, => good handle', path);
+		// 	});
+
+		// 	console.log(router.getHandle(''));
+		// 	console.log(router.getHandle('/'));
+		// 	console.log(router.getHandle('/hello'));
+		// 	console.log(router.getHandle('/hello/'));
+		// 	console.log(router.getHandle('/hello/world'));
+		// 	console.log(router.getHandle('/hello/world/js'));
+		// 	console.log(router.getHandle('/good'));
+		// 	console.log(router.getHandle('/xwg'));
+		// 	console.log(router.getHandle('/xwg/love/'));
+		// 	console.log(router.getHandle('/xwg/love/xuer'));
+
+		// 	router.dispatch('');
+		// 	router.dispatch('/');
+		// 	router.dispatch('/hello');
+		// 	router.dispatch('/hello/');
+		// 	router.dispatch('/hello/world');
+		// 	router.dispatch('/hello/world/js');
+		// 	router.dispatch('/good');
+		// 	router.dispatch('/xwg');
+		// 	router.dispatch('/xwg/love/');
+		// 	router.dispatch('/xwg/love/xuer');
+		// });
+	</script>
+</body>
+</html>
