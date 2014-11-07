@@ -42,6 +42,33 @@ Sender.prototype = {
         }
         return this;
     },
+    parseRange: function(len, range) {
+        var i = range.indexOf('=');
+        var invalid = false;
+        if (i == -1) return false;
+        var arr = range.slice(i + 1).split(',').map(function(item){
+            var rg = item.split('-');
+            var start = parseInt(rg[0]);
+            var end = parseInt(rg[1]);
+            // --xxx
+            if (isNaN(start)) {
+                start = len - end;
+                end = len - 1;
+            }
+            // xxx-
+            else if (isNaN(end)) {
+                end = len - 1;
+            }
+
+            if (end > len) end = len - 1;
+
+            if (isNaN(start) || isNaN(end) || start > end) invalid = true;
+
+            return {start: start, end: end};
+        });
+        return invalid ? false : arr;
+
+    },
     isMelicious: function () {
         var realpath = path.normalize(this.path);
         return realpath.indexOf(this.root);
@@ -98,7 +125,9 @@ Sender.prototype = {
     },
     send: function () {
         var res = this.res;
+        var req = this.req;
         var that = this;
+        var options = {};
         var melicious = this.isMelicious();
 
         if (melicious == -1 || melicious > 0) return this.error(403);
@@ -108,26 +137,39 @@ Sender.prototype = {
             if (err) return that.error(404);
             if (stats.isDirectory()) return that.redirect();
 
+            var len = stats.size;
             res.statusCode = 200;
             res.setHeader('Content-Type', mime.lookup(that.path));
             that.setHeader(stats);
 
             if (that.isNotModified()) return that.notModified();
 
-            var stream = fs.createReadStream(that.path);
+            if (req.headers.range) {
+                var range = that.parseRange(stats.size, req.headers.range);
+                if (range) {
+                    res.statusCode = 206;
+                    res.setHeader('Content-Range', 'bytes '
+                        + range[0].start + '-' + range[0].end
+                        + '/' + stats.size);
+                    options.start = range[0].start;
+                    options.end = range[0].end;
+                    len = range[0].end - range[0].start + 1;
+                }
+            }
+            res.setHeader('Content-Length', len);
+
+            var stream = fs.createReadStream(that.path, options);
             stream.pipe(res);
             stream.on('error', function () {
-                res.destory();
+                res.destroy();
             });
-            res.on('close', function () {
-                stream.destory();
-            })
+            req.on('close', stream.destroy.bind(stream));
         });
     },
     setHeader: function (stats) {
+        var req = this.req;
         var res = this.res;
         res.setHeader('Last-Modified', stats.mtime.toUTCString());
-        res.setHeader('Content-Length', stats.size);
         res.setHeader('Etag', etag(stats));
         res.setHeader('Date', (new Date).toUTCString());
     }
